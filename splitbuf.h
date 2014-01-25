@@ -7,7 +7,7 @@
 #define SPLITBUF_STRIPENCLOSE 16
 #define SPLITBUF_ALL 31
 
-extern int splitbuf(int, char *, char *, char *, char ***);
+extern int splitbuf(int, char *, char *, char *, int, char ***);
 
 #define _SPLITBUF_H_
 #endif

@@ -66,15 +66,37 @@ readwholefile(char *filename, int options)
 			if (!eol)
 				eol = strchr(thisline, '\n');
 
+			char *x;
+			int inquote = 0;
+			int escape = 0;
+			
+			for (x = thisline; x && *x; )
+			{
+				if (*x == '\\')
+					escape = !escape;
+				if (*x == '"' && !escape)
+					inquote = !inquote;
+
+				if (!inquote && (*x == '#' || (*x == '/' && *(x + 1) == '/')))
+				{
+					*x = '\0';
+					x = NULL; // will exit loop
+				}
+				else
+					x++;
+			}
+#if 0
 			char *tmp = strchr(thisline, '#');
 			if (tmp)
 				*tmp = '\0';
 			char *tmp2 = strstr(thisline, "//");
 			if (tmp2)
 				*tmp2 = '\0';
+#endif
 
 			// if we're keeping newlines, and there was a comment in the line, put the newline back
-			if (eol && (tmp || tmp2) && !(options & READFILES_NONL))
+			//if (eol && (tmp || tmp2) && !(options & READFILES_NONL))
+			if (eol && x == NULL && !(options & READFILES_NONL))
 				strcat(thisline, eol);
 		}
 		if (options & READFILES_CLEANLINE)

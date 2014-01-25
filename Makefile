@@ -3,7 +3,7 @@ test: cleanline getpw splitbuf readfiles
 
 OUTFILES=cleanline getpw splitbuf readfiles liberic.so
 
-CFLAGS=-Wall -Wextra -Wno-unused-parameter -fPIC
+CFLAGS=-Wall -Wextra -Wno-unused-parameter -fPIC 
 LDFLAGS=
 LIBS=
 

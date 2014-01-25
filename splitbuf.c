@@ -107,7 +107,7 @@ my_ignorecpy(char *dst, char *src, int len, const char *ignore, int ignorecase)
 }
 
 int
-splitbuf(int flags, char *line, char *sep, char *enclose, char ***retmembers)
+splitbuf(int flags, char *line, char *sep, char *enclose, int pieces, char ***retmembers)
 {
 	char **members;
 	char *p;
@@ -144,6 +144,9 @@ splitbuf(int flags, char *line, char *sep, char *enclose, char ***retmembers)
 		mysep = sep;
 
 	p = element = line; 
+
+	if (pieces == 1)
+		p += strlen(p); // go to end
 
 	while (1)
 	{
@@ -193,6 +196,9 @@ splitbuf(int flags, char *line, char *sep, char *enclose, char ***retmembers)
 
 			if (!*p && !nobreak)
 				break;
+
+			if (pieces > 0 && count + 1 >= pieces && *p)
+				p += strlen(p);
 		}
 		else
 		{
@@ -277,16 +283,17 @@ int
 main(int argc, char **argv)
 {
 	int rval;
-	int flags;
+	int flags, pieces;
 	char **answer = NULL;
 
-	if (argc != 5)
-		exit(127);
+	if (argc != 6)
+		printf("usage: %s <flags> <string> <sepchars> <enclosechars> <parts>\n", argv[0]), exit(0);
 
 	printf("original: %s\n", argv[2]);
 
 	flags = atoi(argv[1]);
-	rval = splitbuf(flags, argv[2], argv[3], argv[4], &answer);
+	pieces = atoi(argv[5]);
+	rval = splitbuf(flags, argv[2], argv[3], argv[4], pieces, &answer);
 
 	//printf("rval %i\n", rval);
 
@@ -298,6 +305,6 @@ main(int argc, char **argv)
 
 	free(answer);
 
-	return(0);
+	return(rval);
 }
 #endif

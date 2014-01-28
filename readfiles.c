@@ -4,6 +4,7 @@
 
 #include "readfiles.h"
 #include "cleanline.h"
+#include "splitbuf.h"
 #include "debug.h"
 
 char *
@@ -47,16 +48,36 @@ read_line(FILE *infile, int options)
 	}
 }
 
+int
+in_array(char **array, char *str)
+{
+	int i;
+
+	for (i = 0; array[i]; i++)
+	{
+		if (array[i][0] && !strncmp(str, array[i], strlen(array[i])))
+			return 1;
+	}
+
+	return 0;
+}
+
 char *
-readwholefile(char *filename, int options)
+readwholefile(char *filename, char *commentsplit, int options)
 {
 	char *buf = NULL;
 	FILE *infile;
 	char *thisline;
+	char **comments = NULL;
 
 	infile = fopen(filename, "r");
 	if (!infile)
 		return(NULL);
+
+	int inquote = 0;
+	int escape = 0;
+
+	splitbuf(SPLITBUF_COPY, commentsplit ? commentsplit : "#|//", "|", "", 0, &comments);
 
 	while ((thisline = read_line(infile, 0)) != NULL)
 	{
@@ -67,23 +88,30 @@ readwholefile(char *filename, int options)
 				eol = strchr(thisline, '\n');
 
 			char *x;
-			int inquote = 0;
-			int escape = 0;
 			
 			for (x = thisline; x && *x; )
 			{
-				if (*x == '\\')
-					escape = !escape;
-				if (*x == '"' && !escape)
-					inquote = !inquote;
+				if ((*x == '"' || *x == '\'') && !escape)
+				{
+					if (*x == inquote)
+						inquote = 0;
+					else
+						inquote = *x;
+				}
 
-				if (!inquote && (*x == '#' || (*x == '/' && *(x + 1) == '/')))
+				if (!inquote && in_array(comments, x))
 				{
 					*x = '\0';
 					x = NULL; // will exit loop
 				}
 				else
+				{
+					if (*x == '\\')
+						escape = 1;
+					else
+						escape = 0;
 					x++;
+				}
 			}
 #if 0
 			char *tmp = strchr(thisline, '#');
@@ -124,6 +152,8 @@ readwholefile(char *filename, int options)
 		free(thisline);
 	}
 	fclose(infile);
+	if (comments)
+		free(comments);
 	return(buf);
 }
 
@@ -132,9 +162,9 @@ int
 main(int argc, char **argv)
 {
 	char *filebuf;
-	int option = atoi(argv[2]);
+	int option = atoi(argv[3]);
 
-	filebuf = readwholefile(argv[1], option);
+	filebuf = readwholefile(argv[1], argv[2], option);
 	printf("read in:\n%s\n", filebuf);
 	free(filebuf);
 	

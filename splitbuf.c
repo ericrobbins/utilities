@@ -204,10 +204,13 @@ splitbuf(int flags, char *line, char *sep, char *enclose, int pieces, char ***re
 		{
 			if (*p && enclose && *enclose)
 			{
-				if (!escaped && strchr(enclose, *p))
+				if (!escaped && ((!enclosed && strchr(enclose, *p)) || *p == enclosed))
 				{
 					stripchars++;
-					enclosed = !enclosed;
+					if (enclosed)
+						enclosed = 0;
+					else
+						enclosed = *p;
 				}
 				if (enclosed && *p == '\\')
 				{

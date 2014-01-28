@@ -7,20 +7,20 @@ CFLAGS=-Wall -Wextra -Wno-unused-parameter -fPIC
 LDFLAGS=
 LIBS=
 
-liberic.so: cleanline.o getpw.o splitbuf.o searchreplace.o readfiles.o
-	gcc -shared cleanline.o getpw.o splitbuf.o searchreplace.o readfiles.o -o liberic.so
+liberic.so: cleanline.o getpw.o splitbuf.o searchreplace.o readfiles.o debug.o
+	gcc -shared cleanline.o getpw.o splitbuf.o searchreplace.o readfiles.o debug.o -o liberic.so
 
-cleanline: cleanline.c
-	gcc -D_TEST_ $(CFLAGS) -o cleanline cleanline.c 
+cleanline: cleanline.c debug.o
+	gcc -D_TEST_ $(CFLAGS) -o cleanline cleanline.c  debug.o
 
-getpw: getpw.c cleanline.o
-	gcc -D_TEST_ $(CFLAGS) -o getpw getpw.c cleanline.o
+getpw: getpw.c cleanline.o debug.o
+	gcc -D_TEST_ $(CFLAGS) -o getpw getpw.c cleanline.o debug.o
 
-splitbuf: splitbuf.c
-	gcc -D_TEST_ $(CFLAGS) -o splitbuf splitbuf.c
+splitbuf: splitbuf.c debug.o
+	gcc -D_TEST_ $(CFLAGS) -o splitbuf splitbuf.c debug.o
 
-readfiles: readfiles.c cleanline.o
-	gcc -D_TEST_ $(CFLAGS) -o readfiles readfiles.c cleanline.o
+readfiles: readfiles.c cleanline.o splitbuf.o debug.o
+	gcc -D_TEST_ $(CFLAGS) -o readfiles readfiles.c cleanline.o splitbuf.o debug.o
 
 clean:
 	rm -f *.o $(OUTFILES)

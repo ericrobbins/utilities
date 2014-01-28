@@ -7,6 +7,6 @@
 #define READFILES_ALL 255
 
 char *read_line(FILE *, int);
-char *readwholefile(char *, int);
+char *readwholefile(char *, char *, int);
 
 #endif

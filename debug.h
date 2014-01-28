@@ -2,12 +2,12 @@
 #define _DEBUG_H_
 
 #define debug(lev, x, ...)  \
-	{if (debuglevel >= lev) {fprintf(stderr, "%s: ", __FUNCTION__); \
+	do {if (debuglevel >= lev) {fprintf(stderr, "%s: ", __FUNCTION__); \
 	fprintf(stderr, (x), ##__VA_ARGS__); \
-	if (*(x + strlen(x) - 1) != '\n') {fprintf(stderr, "\n");}}}
+	if (*(x + strlen(x) - 1) != '\n') {fprintf(stderr, "\n");}}} while (0);
 
-#define fail(x, ...)    {fprintf(stderr, x, ##__VA_ARGS__); exit(1);}
+#define fail(x, ...)    do {fprintf(stderr, x, ##__VA_ARGS__); exit(1);} while (0);
 
-extern int debuglevel = 1;
+extern int debuglevel;
 
 #endif

@@ -1,9 +1,12 @@
-all: test liberic.so
+all: test liberic.so errno
 test: cleanline getpw splitbuf readfiles
 
-OUTFILES=cleanline getpw splitbuf readfiles liberic.so
+OUTFILES=cleanline getpw splitbuf readfiles
+OUTLIBS=liberic.so
+OUTPROGS=errno
 
 CFLAGS=-Wall -Wextra -Wno-unused-parameter -fPIC 
+#CFLAGS=-Wall -Wextra -Wno-unused-parameter -fPIC -g3
 LDFLAGS=
 LIBS=
 
@@ -22,12 +25,16 @@ splitbuf: splitbuf.c debug.o
 readfiles: readfiles.c cleanline.o splitbuf.o debug.o
 	gcc -D_TEST_ $(CFLAGS) -o readfiles readfiles.c cleanline.o splitbuf.o debug.o
 
+errno: errno.c
+	gcc $(CFLAGS) -o errno errno.c
+
 clean:
-	rm -f *.o $(OUTFILES)
+	rm -f *.o $(OUTFILES) $(OUTLIBS) $(OUTPROGS)
 
 install: all
 	cp *.h /usr/local/include
-	cp *.so /usr/local/lib
+	cp $(OUTLIBS) /usr/local/lib
+	cp $(OUTPROGS) /usr/local/bin
 	ldconfig
 
 .c.o:

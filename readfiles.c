@@ -7,6 +7,18 @@
 #include "splitbuf.h"
 #include "debug.h"
 
+static void
+memstrcat(char *dst, char *src)
+{
+	int dlen = strlen(dst);
+	int slen = strlen(src);
+
+	//debug(3, "memmove(%x, %x, %i)\n", dst + dlen, src, slen);
+	debug(3, "memmove(%s, %s, %i)\n", dst + dlen, src, slen);
+	memmove(dst + dlen, src, slen);
+	dst[dlen + slen] = '\0';
+}
+
 char *
 read_line(FILE *infile, int options)
 {
@@ -27,7 +39,7 @@ read_line(FILE *infile, int options)
 		else
 			newbuf = calloc(strlen(buf) + 1, 1);
 
-		strcat(newbuf, buf);
+		memstrcat(newbuf, buf);
 
 		tmp = strchr(newbuf, '\n');
 		if (!tmp)
@@ -48,7 +60,7 @@ read_line(FILE *infile, int options)
 	}
 }
 
-int
+static int
 in_array(char **array, char *str)
 {
 	int i;
@@ -125,7 +137,7 @@ readwholefile(char *filename, char *commentsplit, int options)
 			// if we're keeping newlines, and there was a comment in the line, put the newline back
 			//if (eol && (tmp || tmp2) && !(options & READFILES_NONL))
 			if (eol && x == NULL && !(options & READFILES_NONL))
-				strcat(thisline, eol);
+				memstrcat(thisline, eol);
 		}
 		if (options & READFILES_CLEANLINE)
 		{

@@ -226,17 +226,26 @@ splitbuf(int flags, char *line, char *sep, char *enclose, int pieces, char ***re
 		//printf("p = %c escaped = %i enclosed = %i\n", *p, escaped, enclosed);
 	}
 
-/*
-	int x;
-	for (x = 0; x < count; x++)
-		printf("members[%i] = %s\n", x, members[x]);
-*/
+	/*
+		this is a little tricky, but instead of allocating a bunch of string elements,
+		I just allocate one large block of memory with enough room for all the individual
+ 		elements, and pointers to them, all in one string.. ie:
+	
+ 		0 1 2 3 4 5 6 7 8 9 A B C D E F10 1 2 3 4 5 6 7 8 9 A B
+ 		---------------+---------------+---------------+--------
+ 		char*      0x18|char*      0x1A|char*       0x0|a \0b \0
+ 		--------------------------------------------------------
+	
+ 		28 bytes holding 3 char * (terminating null *), and 2 fields "a" and "b".
+ 		This is similar but not identical to how DNS packets are compressed.
+	*/
 
 	if (flags & SPLITBUF_COPY)
 	{
 		int memberslen = (sizeof(char *) * (count + 1)) +
 			(totallen * sizeof(char)) - 
 			(((flags & SPLITBUF_STRIPENCLOSE) ? stripchars : 0) * sizeof(char));
+
 /*
 printf("memberslen %i = count %i (%li) + totallen %i (%li) - stripchars %i\n", 
 	memberslen, 

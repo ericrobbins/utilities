@@ -7,6 +7,7 @@
 	if (*(x + strlen(x) - 1) != '\n') {fprintf(stderr, "\n");}}} while (0);
 
 #define fail(x, ...)    do {fprintf(stderr, x, ##__VA_ARGS__); exit(1);} while (0);
+#define fail2(n, x, ...)  do {fprintf(stderr, x, ##__VA_ARGS__); exit(n);} while(0);
 
 extern int debuglevel;
 void debug_init();
